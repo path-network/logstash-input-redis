@@ -157,7 +157,7 @@ module LogStash module Inputs class Redis < LogStash::Inputs::Threadable
 
     # register any renamed Redis commands
     if @command_map.any?
-      client_command_map = redis.client.command_map
+      client_command_map = redis._client.command_map
       @command_map.each do |name, renamed|
         client_command_map[name.to_sym] = renamed.to_sym
       end
@@ -269,14 +269,14 @@ EOF
     return if @redis.nil? || !@redis.connected?
     # if its a SubscribedClient then:
     # it does not have a disconnect method (yet)
-    if @redis.client.is_a?(::Redis::SubscribedClient)
+    if @redis._client.is_a?(::Redis::SubscribedClient)
       if @data_type == 'pattern_channel'
-        @redis.client.punsubscribe
+        @redis._client.punsubscribe
       else
-        @redis.client.unsubscribe
+        @redis._client.unsubscribe
       end
     else
-      @redis.client.disconnect
+      @redis._client.disconnect
     end
     @redis = nil
   end
